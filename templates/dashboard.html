@@ -1,0 +1,106 @@
+<div class="logout-container">
+    <div class="btn btn-logout">Logout</div>
+</div>
+
+<div class="dashboard-title-container">
+    <h1>All Assets</h1>
+</div>
+
+<div class="card-container">
+
+</div>
+
+<div class="add-new-contaniner">
+    <i class="fa-solid fa-circle-plus" id="card-add-new"></i>
+</div>
+</div>
+
+
+<!--  Add form -->
+
+<div class="form-container hideForm form-add-container">
+    <div class="form-top">
+        <div class="close-btn-container"><i class="fa-solid fa-circle-xmark close-button"></i></div>
+        <h1>Add New Asset</h1>
+        <div class="error-message" style="display: none;">
+            <p>This is an error</p>
+        </div>
+    </div>
+
+    <form class="user-form form-add" action="/api/assets" method="POST" id="add" autocomplete="off">
+
+        <input type="hidden" name="_method" id="_method" value="POST">
+
+        <div class=" input-container">
+            <label for="coin_name ">Coin: </label>
+            <input type="text" name="coin_name" id="coin_name" placeholder="BTC " class="user-input">
+        </div>
+
+        <div class="input-container suggest-container-main">
+            <label for="coin_name"></label>
+            <div class="user-input suggest-container">
+
+            </div>
+        </div>
+
+
+        <div class="input-container">
+            <label for="coin_amount">Amount: </label>
+            <input type="number" name="coin_amount" id="coin_amount" class="user-input" step="0.000001">
+        </div>
+
+        <div class="input-container">
+            <label for="bought_date">Date: </label>
+            <input type="date" name="bought_date" placeholder="dd-mm-yyyy" id="bought_date" class="user-input">
+        </div>
+
+        <div class="submit-button-container">
+            <button type="submit" class="submit-btn"><i class="fa-solid fa-check"></i></button>
+        </div>
+    </form>
+</div>
+
+
+
+<!--  edit form -->
+
+<div class="form-container hideForm form-edit-container ">
+    <div class="form-top ">
+        <div class="close-btn-container"><i class="fa-solid fa-circle-xmark close-button"></i></div>
+        <h1>Edit</h1>
+        <div class="error-message" style="display: none;">
+            <p>This is an error</p>
+        </div>
+    </div>
+
+    <form class="user-form form-edit" action="/api/assets" method="PUT" id="edit" autocomplete="off">
+
+        <input type="hidden" name="_method" id="_method" value="PUT">
+
+        <div class="input-container">
+            <label for="coin_name">Coin: </label>
+            <input type="text" name="coin_name" id="coin_name" placeholder="BTC" class="user-input">
+        </div>
+
+        <div class="input-container suggest-container-main">
+            <label for="coin_name"></label>
+            <div class="user-input suggest-container">
+            </div>
+        </div>
+
+        <div class="input-container">
+            <label for="coin_amount">Amount: </label>
+            <input type="number" name="coin_amount " id="coin_amount" class="user-input" step="0.000001">
+        </div>
+
+        <div class="input-container">
+            <label for="bought_date">Date: </label>
+            <input type="date" name="bought_date" id="bought_date" class="user-input ">
+
+        </div>
+
+        <div class="submit-button-container">
+            <button type="submit" class="submit-btn"><i class="fa-solid fa-check"></i></button>
+        </div>
+    </form>
+</div>

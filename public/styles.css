@@ -1,0 +1,573 @@
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800&family=Heebo&family=Montserrat:wght@600&family=Open+Sans:wght@500&family=Roboto:wght@300;400;700&display=swap');
+:root {
+    --dark-background: #171717;
+    --button-background: #B8B8B8;
+    --button-active-background: #3b3b3b;
+    --form-background: #272626;
+    --font-color: #B8B8B8;
+    --card-background: #272626;
+}
+
+* {
+    /* this makes total size = size + padding + boarder */
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--dark-background);
+}
+
+
+/*  CSS for index page (login button etc) */
+
+.title-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10%;
+}
+
+.hide {
+    visibility: hidden;
+    transform: scale(0);
+    height: 0;
+    width: 0;
+}
+
+.title-container h1 {
+    color: white;
+    font-size: 4rem;
+    font-weight: 400;
+    margin: 5px auto;
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 42px rgb(255, 255, 255), 0 0 82px rgb(255, 255, 255), 0 0 92px rgb(255, 255, 255);
+}
+
+.title-container h4 {
+    color: white;
+    font-size: 1.5rem;
+    margin: 5px auto;
+    font-weight: 400;
+}
+
+.buttons-container {
+    margin-top: 5%;
+}
+
+.btn {
+    background-color: var(--button-background);
+    margin: 20px;
+    width: 180px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: transform 0.1s ease-in-out, color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+    user-select: none;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.btn:active {
+    background-color: var(--button-active-background);
+    color: var(--button-background);
+}
+
+
+/* CSS for forms */
+
+.form-container {
+    background-color: var(--form-background);
+    /* backup */
+    /* min-width: 450px; */
+    min-width: 350px;
+    max-width: 900px;
+    width: 70vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+    border-radius: 20px;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.form-add-container,
+.form-edit-container {
+    margin-top: 10%;
+}
+
+.form-top {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
+
+@media only screen and (max-width: 600px) {
+    .form-top {
+        padding-left: 20px;
+    }
+}
+
+.close-btn-container {
+    width: 100%;
+    display: flex;
+    justify-content: right;
+}
+
+.close-button {
+    position: relative;
+    font-size: 3rem;
+    margin: 10px;
+    color: var(--font-color);
+    transition: transform 0.1s ease-in-out, color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+}
+
+.close-button:hover {
+    transform: scale(1.2);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+}
+
+.close-button:active {
+    color: var(--form-background);
+}
+
+.form-top h1 {
+    font-size: 4rem;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    top: -30px;
+    color: var(--font-color);
+    font-weight: 400;
+}
+
+.error-message {
+    width: 100%;
+    height: 50px;
+    background-color: rgba(222, 1, 1, 0.933);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.error-message p {
+    text-align: center;
+}
+
+.user-form {
+    min-width: 70%;
+}
+
+.hideForm {
+    /* visibility: hidden; */
+    opacity: 0;
+    transform: scale(0);
+    height: 0;
+    width: 0;
+}
+
+.input-container {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 20px;
+    max-width: 90%;
+    width: 90%;
+    align-items: center;
+}
+
+.input-container label {
+    font-size: 1.2rem;
+    color: var(--font-color);
+    min-width: 130px;
+    width: 30%;
+    padding: 10px;
+    user-select: none;
+}
+
+.user-input {
+    font-size: 1.2rem;
+    height: 2.5rem;
+    width: 60%;
+}
+
+.submit-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+}
+
+.submit-btn {
+    display: flex;
+    justify-content: center;
+    font-size: 5rem;
+    color: var(--font-color);
+    margin: 10px;
+    transition: transform 0.1s ease-in-out, color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+    user-select: none;
+    width: 100px;
+    background-color: rgba(0, 0, 0, 0);
+    border-style: none;
+}
+
+.submit-btn:hover {
+    transform: scale(1.2);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+}
+
+.submit-btn:active {
+    color: var(--form-background);
+}
+
+
+/*  CSS for Dashboard area (including cards) */
+
+.logout-container {
+    /* background-color: white; */
+    margin-top: 40px;
+    width: 100%;
+    display: flex;
+    justify-content: end;
+}
+
+.btn-logout {
+    transform: scale(0.8);
+    margin: 0;
+}
+
+.dashboard-title-container {
+    /* background-color: aliceblue; */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard-title-container h1 {
+    font-size: 4rem;
+    margin: 10px;
+    font-weight: 500;
+    color: var(--font-color);
+}
+
+.card-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    /* background-color: aliceblue; */
+    max-width: 700px;
+}
+
+.card {
+    background-color: var(--card-background);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--font-color);
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin: 10px;
+}
+
+.card-top {
+    color: var(--font-color);
+    width: 100%;
+    height: 100px;
+    display: flex;
+}
+
+.card-top-left {
+    width: 50%;
+    display: flex;
+    align-items: center;
+    /* background-color: aliceblue; */
+}
+
+.card-image-container {
+    margin: 1% 10% 1% 5%;
+    width: 80px;
+    height: 90px;
+    /* max-width: 100px; */
+}
+
+.card-image {
+    height: 90px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.card-title-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-title-container h1 {
+    font-size: 2rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.card-title-container p {
+    font-size: 0.9rem;
+    font-weight: 100;
+    margin: 0;
+}
+
+.card-top-right {
+    width: 50%;
+    /* background-color: bisque; */
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+}
+
+.card-top-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card-top-right h2 {
+    font-size: 1.75rem;
+    font-weight: 500;
+    margin: 0;
+    margin-right: 5%;
+}
+
+.card-top-right p {
+    /* font-size: 1.75rem; */
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin: 0;
+    margin-right: 5%;
+}
+
+@media only screen and (max-width: 500px) {
+    .card-top-right h2,
+    .card-title-container h1 {
+        font-size: 1.3rem;
+    }
+    .card-top-right p {
+        font-size: 0.85rem;
+    }
+    .card-image-container {
+        width: 60px;
+        height: 70px;
+    }
+    .card-image {
+        height: 70px;
+    }
+}
+
+.red {
+    color: rgba(222, 1, 1, 0.933);
+}
+
+.green {
+    color: rgb(4, 154, 4);
+}
+
+.card-bottom {
+    margin-top: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.card-bottom-top {
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    width: 95%;
+    display: flex;
+    transition: height 0.05s cubic-bezier(0.075, 0.82, 0.165, 1), transform 0.1s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+
+/* For hide the more details */
+
+.card-shinked {
+    visibility: hidden;
+    transform: scale(0);
+    height: 0;
+}
+
+
+/*  hide the buttons  accordingly */
+
+.btn-hidden {
+    display: none;
+}
+
+.bought-bottom-container {
+    width: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5%;
+}
+
+@media only screen and (max-width: 600px) {
+    .bought-bottom-container {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+    .card-bottom-top {
+        flex-direction: column;
+    }
+}
+
+.data-container {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.data-container h4 {
+    font-size: 1.7rem;
+    font-weight: 500;
+    margin: 5px;
+}
+
+.data-container h5 {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 2px;
+}
+
+.data-container p {
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin: 2px;
+}
+
+.card-bottom-bottom {
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-top: 0;
+    font-size: 2rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.card-button {
+    transition: transform 0.1s ease-in-out, color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+}
+
+.card-button:hover {
+    transform: scale(1.3);
+    cursor: pointer;
+}
+
+.card-button:active {
+    color: var(--button-active-background);
+}
+
+.card-shrink {
+    display: none;
+}
+
+.add-new-contaniner {
+    padding: 40px;
+}
+
+#card-add-new {
+    color: var(--font-color);
+    font-size: 6rem;
+    transition: transform 0.1s ease-in-out, color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+}
+
+#card-add-new:hover {
+    transform: scale(1.3);
+    cursor: pointer;
+}
+
+#card-add-new:active {
+    color: var(--button-active-background);
+}
+
+.footer {
+    color: var(--font-color);
+    font-size: 0.75rem;
+    position: relative;
+    bottom: 0;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.suggest-container-main {
+    margin-top: 0;
+    position: absolute;
+    transform: translateY(-20px);
+    float: left;
+    min-width: 315px;
+    width: 44.1%;
+    max-width: 566.997px;
+    z-index: 5;
+    /* height: 0; */
+    /* display: none; */
+}
+
+
+/* backup */
+
+
+/* .suggest-container-main {
+    margin-top: 0;
+    position: absolute;
+    transform: translateY(-20px);
+    float: left;
+    min-width: 377.094px;
+    width: 44.1%;
+    max-width: 566.997px;
+    z-index: 5;
+    /* height: 0; */
+
+
+/* display: none; */
+
+*/
+/* Useless ? */
+
+.suggest-container {
+    z-index: 5;
+}
+
+.auto-suggestion {
+    user-select: none;
+    background-color: rgb(208, 207, 207);
+    border: solid 0.5px rgb(111, 111, 111);
+    border-radius: 3px;
+    padding: 5px;
+    padding-left: 5px;
+}
+
+.auto-suggestion:hover {
+    background-color: #B8B8B8;
+    cursor: pointer;
+}

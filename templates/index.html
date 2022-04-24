@@ -1,0 +1,78 @@
+<div class="title-container">
+    <h1>Traccrypto</h1>
+    <h4>Keep track of all your crypto holdings</h4>
+</div>
+
+<div class="buttons-container">
+    <div class="btn signup-btn">Signup</div>
+    <div class="btn login-btn">Login</div>
+</div>
+
+<!-- Sign up form -->
+
+<div class="form-container hideForm form-signup-container">
+    <div class="form-top">
+        <div class="close-btn-container"><i class="fa-solid fa-circle-xmark close-button"></i></div>
+        <h1>Signup</h1>
+        <div class="error-message" style="display: none;">
+            <p>This is an error oon signup</p>
+        </div>
+    </div>
+
+    <form class="user-form form-signup" action="/api/users" method="POST" id="signup">
+
+        <input type="hidden" name="_method" id="_method" value="POST">
+
+        <div class="input-container">
+            <label for="user_email">Email: </label>
+            <input type="email" name="user_email" id="user_email" placeholder="youremail@abc.com" class="user-input">
+        </div>
+
+        <div class="input-container">
+            <label for="user_password">Password: </label>
+            <input type="password" name="user_password" id="user_password" class="user-input">
+        </div>
+
+        <div class="input-container">
+            <label for="confirm_user_password">Confirm Password: </label>
+            <input type="password" name="confirm_user_password" id="confirm_user_password" class="user-input">
+
+        </div>
+
+        <div class="submit-button-container">
+            <button type="submit" class="submit-btn"><i class="fa-solid fa-check"></i></button>
+            <!-- <div class="submit-btn"><i class="fa-solid fa-check"></i></div> -->
+        </div>
+    </form>
+</div>
+
+<!--  Form for login -->
+
+<div class="form-container hideForm form-login-container">
+    <div class="form-top">
+        <div class="close-btn-container"><i class="fa-solid fa-circle-xmark close-button"></i></div>
+        <h1>Login</h1>
+        <div class="error-message" style="display: none;">
+            <p>This is an error</p>
+        </div>
+    </div>
+
+    <form class="user-form form-login" action="/api/tokens" method="POST" id="login">
+
+        <input type="hidden" name="_method" id="_method" value="POST">
+
+        <div class="input-container">
+            <label for="user_email">Email: </label>
+            <input type="email" name="user_email" id="user_email" placeholder="youremail@abc.com" class="user-input">
+        </div>
+
+        <div class="input-container">
+            <label for="user_password">Password: </label>
+            <input type="password" name="user_password" id="user_password" class="user-input">
+        </div>
+
+        <div class="submit-button-container">
+            <button type="submit" class="submit-btn"><i class="fa-solid fa-check"></i></button>
+        </div>
+    </form>
+</div>
