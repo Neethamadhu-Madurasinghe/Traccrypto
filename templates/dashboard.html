@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <form class="user-form form-add" action="/api/assets" method="POST" id="add" autocomplete="off">
+    <form class="user-form form-add form-identifier" action="/api/assets" method="POST" id="add" autocomplete="off">
 
         <input type="hidden" name="_method" id="_method" value="POST">
 
@@ -73,9 +73,10 @@
         </div>
     </div>
 
-    <form class="user-form form-edit" action="/api/assets" method="PUT" id="edit" autocomplete="off">
+    <form class="user-form form-edit form-identifier" action="/api/assets" method="PUT" id="edit" autocomplete="off">
 
         <input type="hidden" name="_method" id="_method" value="PUT">
+        <input type="hidden" name="_method" id="assetId">
 
         <div class="input-container">
             <label for="coin_name">Coin: </label>

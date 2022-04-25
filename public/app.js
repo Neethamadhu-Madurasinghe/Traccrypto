@@ -115,12 +115,19 @@ ui.showEditAsset = function(card) {
     // get asset Data from the server
     app.client.request(undefined, '/api/assets', 'GET', { id: assetId }, undefined, function(statusCode, responsePayload) {
         if (statusCode == 200) {
-            // need to reformat date to dd-mm-yyyy
-            const reformattedDate = responsePayload.buy_date.substr(6, 4) + '-' + responsePayload.buy_date.substr(3, 2) + '-' + responsePayload.buy_date.substr(0, 2);
+            try {
+                // need to reformat date to dd-mm-yyyy
+                const reformattedDate = responsePayload.buy_date.substr(6, 4) + '-' + responsePayload.buy_date.substr(3, 2) + '-' + responsePayload.buy_date.substr(0, 2);
 
-            document.querySelector('.form-edit-container #bought_date').value = reformattedDate;
-            document.querySelector('.form-edit-container #coin_name').value = responsePayload.coin_symbol + ' - ' + app.coinList[responsePayload.coin_symbol][1];
-            document.querySelector('.form-edit-container #coin_amount').value = parseFloat(responsePayload.coin_amount);
+                document.querySelector('.form-edit-container #bought_date').value = reformattedDate;
+                document.querySelector('.form-edit-container #coin_name').value = responsePayload.coin_symbol + ' - ' + app.coinList[responsePayload.coin_symbol][1];
+                document.querySelector('.form-edit-container #coin_amount').value = parseFloat(responsePayload.coin_amount);
+                document.querySelector('.form-edit-container #assetId').value = responsePayload.id;
+            } catch (e) {
+                document.querySelector('.form-edit-container .error-message').innerHTML = '<p>Could not fetch required data</p>';
+                document.querySelector('.form-edit-container .error-message').style.display = 'block';
+            }
+
         } else {
             document.querySelector('.form-edit-container .error-message').innerHTML = '<p>Could not fetch required data</p>';
             document.querySelector('.form-edit-container .error-message').style.display = 'block';
@@ -333,7 +340,6 @@ app.addCoinNameSearch = function() {
 
         // Get the input field and add a keyup event
         coin_name.addEventListener('keyup', function() {
-            console.log(ownerFormID);
             // Clear the Suggestion section
             document.querySelector(`#${ownerFormID} .suggest-container`).innerHTML = '';
 
@@ -370,7 +376,7 @@ app.addCoinNameSearch = function() {
     });
 
 };
-
+//@todo : Fix the price issue
 // Create an asset card and add it to the container
 app.renderAssetCard = function(assetObject) {
     const cardCcontainerUI = document.querySelector('.card-container');
@@ -440,9 +446,10 @@ app.renderAssetCard = function(assetObject) {
             <i class="fa-solid fa-circle-chevron-down card-button" id="card-expand"></i>
             <i class="fa-solid fa-circle-chevron-up card-button btn-hidden" id="card-shrink"></i>
 
-            <form action="/api/assets" method="POST" id="delete" class="card-button btn-hidden">
-                <input type="hidden" name="_method" id="_method" value="PUT">
+            <form action="/api/assets" method="POST" id="delete" class="card-button btn-hidden form-identifier">
+                <input type="hidden" name="_method" id="_method" value="DELETE">
                 <i type="submit" class="fa-solid fa-circle-xmark" id="card-delete"></i>
+                <input class="hidden-submit" type="submit" style="display: none;" />
             </form>
             
         </div>
@@ -500,7 +507,8 @@ app.addEventListners = function() {
                 ui.showMoreDetails(e.target);
 
             } else if (e.target.id == 'card-delete') {
-                document.querySelector('#delete').submit();
+                e.target.nextElementSibling.click();;
+
             }
         });
 
@@ -509,7 +517,6 @@ app.addEventListners = function() {
             ui.hideAssets();
             ui.showAddAsset();
         });
-
 
         // form close buttons
         Array.from(document.querySelectorAll('.close-button')).forEach(function(button) {
@@ -521,6 +528,11 @@ app.addEventListners = function() {
             });
         });
 
+        // Logout button
+        document.querySelector('.btn-logout').addEventListener('click', function(e) {
+            app.logUserOut();
+        });
+
 
     }
 
@@ -529,10 +541,11 @@ app.addEventListners = function() {
 // Log out the user
 app.logUserOut = function() {
     const queryStringObject = {
-        'token': app.token
+        'id': app.token
     };
 
     app.client.request(undefined, '/api/tokens', 'DELETE', queryStringObject, undefined, function(statusCode, responseData) {
+        console.log(statusCode, responseData);
         // Set the token to false
         app.setToken(false);
 
@@ -543,99 +556,112 @@ app.logUserOut = function() {
 };
 
 app.bindForms = function() {
-    if (document.querySelector('form')) {
-        const allforms = Array.from(document.querySelectorAll('form'));
+    document.querySelector('body').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-        allforms.forEach(function(form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
+        if (Array.from(e.target.classList).indexOf('form-identifier') > -1) {
 
-                const formId = this.id;
-                const path = this.action;
-                const method = document.querySelector(`.form-${formId}-container #_method`).value;
+            const formId = e.target.id;
+            // Path comes like this : http://localhost:3000/api/assets. So need to get rid of  http://localhost:3000
+            const path = e.target.action.replace('http://localhost:3000', '');
+            console.log(path);
+            const method = document.querySelector(`#${formId} #_method`).value;
 
-                // Hide the error message if is currently visible
+            // Hide the error message if there is one and it is currently visible currently visible
+            if (document.querySelector(`.form-${formId}-container .error-message`)) {
                 document.querySelector(`.form-${formId}-container .error-message`).style.display = 'none';
+            }
 
 
-                const payload = {};
-                // Check for errors can construct payload
 
-                // Signup form
-                if (formId == 'signup') {
-                    payload.email = typeof(document.querySelector('#signup #user_email').value) == 'string' && document.querySelector('#signup #user_email').value.length > 0 && document.querySelector('#signup #user_email').value.indexOf('@') > -1 ? document.querySelector('#signup #user_email').value : false;
-                    payload.password = typeof(document.querySelector('#signup #user_password').value) == 'string' && typeof(document.querySelector('#signup #confirm_user_password').value) == 'string' && document.querySelector('#signup #user_password').value.length > 4 && document.querySelector('#signup #confirm_user_password').value.length > 4 && document.querySelector('#signup #user_password').value === document.querySelector('#signup #confirm_user_password').value ? document.querySelector('#signup #user_password').value : false;
+            const payload = {};
+            // Check for errors can construct payload
 
-                    if (payload.email && payload.password) {
+            // Signup form
+            if (formId == 'signup') {
+                payload.email = typeof(document.querySelector('#signup #user_email').value) == 'string' && document.querySelector('#signup #user_email').value.length > 0 && document.querySelector('#signup #user_email').value.indexOf('@') > -1 ? document.querySelector('#signup #user_email').value : false;
+                payload.password = typeof(document.querySelector('#signup #user_password').value) == 'string' && typeof(document.querySelector('#signup #confirm_user_password').value) == 'string' && document.querySelector('#signup #user_password').value.length > 4 && document.querySelector('#signup #confirm_user_password').value.length > 4 && document.querySelector('#signup #user_password').value === document.querySelector('#signup #confirm_user_password').value ? document.querySelector('#signup #user_password').value : false;
 
-                    } else {
-                        document.querySelector(`.form-${formId}-container .error-message`).innerHTML = '<p>Invalid user name or password</p>';
-                        document.querySelector(`.form-${formId}-container .error-message`).style.display = 'block';
-                        return;
-                    }
+                if (payload.email && payload.password) {
 
-                    // Login form
-                } else if (formId == 'login') {
-                    payload.email = typeof(document.querySelector('#login #user_email').value) == 'string' && document.querySelector('#login #user_email').value.length > 0 && document.querySelector('#login #user_email').value.indexOf('@') > -1 ? document.querySelector('#login #user_email').value : false;
-                    payload.password = typeof(document.querySelector('#login #user_password').value) == 'string' && document.querySelector('#login #user_password').value.length > 4 ? document.querySelector('#login #user_password').value : false;
-
-                    if (payload.email && payload.password) {
-
-                    } else {
-                        document.querySelector(`.form-${formId}-container .error-message`).innerHTML = '<p>Invalid user name or password</p>';
-                        document.querySelector(`.form-${formId}-container .error-message`).style.display = 'block';
-                        return;
-                    }
-
-                    // Add new asset or edit an asset
-                } else if (formId == 'add' || formId == 'edit') {
-                    const date = typeof(document.querySelector(`#${formId} #bought_date`).value) == 'string' && document.querySelector(`#${formId} #bought_date`).value.length == 10 ? document.querySelector(`#${formId} #bought_date`).value : false;
-                    const coinName = typeof(document.querySelector(`#${formId} #coin_name`).value) == 'string' && document.querySelector(`#${formId} #coin_name`).value.length > 0 && document.querySelector(`#${formId} #coin_name`).value.indexOf('-') > -1 ? document.querySelector(`#${formId} #coin_name`).value : false;
-                    payload.amount = parseFloat(document.querySelector(`#${formId} #coin_amount`).value) != 'NaN' && parseFloat(document.querySelector(`#${formId} #coin_amount`).value) > 0 ? parseFloat(document.querySelector(`#${formId} #coin_amount`).value) : false;
-
-                    // Format date to dd-mm-yyyy and fetch the coin symbol and dervied coin id (for the serverside convinience)
-                    if (date && coinName && payload.amount) {
-                        payload.date = date.substr(8, 2) + '-' + date.substr(5, 2) + '-' + date.substr(0, 4);
-                        payload.coinSymbol = coinName.split('-')[0].trim();
-
-                        payload.coin = app.coinList[payload.coinSymbol][0];
-
-                    } else {
-                        // Invalid data - show error
-                        document.querySelector(`.form-${formId}-container .error-message`).innerHTML = `<p>Invalid data format or empty fields - Please check again</p>`;
-                        document.querySelector(`.form-${formId}-container .error-message`).style.display = 'block';
-                        return;
-                    }
-
-                } else if (formId == 'delete') {
-                    // get the id of the current assest
-                    const assestId = e.parentElement.parentElement.parentElement.parentElement;
-                    console.log(assetId);
+                } else {
+                    document.querySelector(`.form-${formId}-container .error-message`).innerHTML = '<p>Invalid user name or password</p>';
+                    document.querySelector(`.form-${formId}-container .error-message`).style.display = 'block';
+                    return;
                 }
-                // Make the query string object - this is needed only when sending DELETE requests 
-                const queryStringObject = method == 'DELETE' ? payload : {};
-                console.log(payload, path, method, queryStringObject);
-                // Call the API
-                // (headers, path, method, queryStringObject, payload, callback)
-                app.client.request(undefined, path, method, queryStringObject, payload, function(statusCode, responsePayload) {
-                    if (!(statusCode == 201 || statusCode == 200)) {
-                        if (statusCode == 403) {
-                            // Invalid token - Logout imedietly
-                            app.logUserOut();
-                        } else {
-                            const error = typeof(responsePayload.error) == 'string' ? responsePayload.error : 'An error occured, please try again';
 
-                            // Show error
+                // Login form
+            } else if (formId == 'login') {
+                payload.email = typeof(document.querySelector('#login #user_email').value) == 'string' && document.querySelector('#login #user_email').value.length > 0 && document.querySelector('#login #user_email').value.indexOf('@') > -1 ? document.querySelector('#login #user_email').value : false;
+                payload.password = typeof(document.querySelector('#login #user_password').value) == 'string' && document.querySelector('#login #user_password').value.length > 4 ? document.querySelector('#login #user_password').value : false;
+
+                if (payload.email && payload.password) {
+
+                } else {
+                    document.querySelector(`.form-${formId}-container .error-message`).innerHTML = '<p>Invalid user name or password</p>';
+                    document.querySelector(`.form-${formId}-container .error-message`).style.display = 'block';
+                    return;
+                }
+
+                // Add new asset or edit an asset
+            } else if (formId == 'add' || formId == 'edit') {
+                // If this is a PUT request, then get the asset ID
+                if (formId == 'edit') {
+                    payload.id = document.querySelector(`#${formId} #assetId`).value;
+                }
+                const date = typeof(document.querySelector(`#${formId} #bought_date`).value) == 'string' && document.querySelector(`#${formId} #bought_date`).value.length == 10 ? document.querySelector(`#${formId} #bought_date`).value : false;
+                const coinName = typeof(document.querySelector(`#${formId} #coin_name`).value) == 'string' && document.querySelector(`#${formId} #coin_name`).value.length > 0 && document.querySelector(`#${formId} #coin_name`).value.indexOf('-') > -1 ? document.querySelector(`#${formId} #coin_name`).value : false;
+                payload.amount = parseFloat(document.querySelector(`#${formId} #coin_amount`).value) != 'NaN' && parseFloat(document.querySelector(`#${formId} #coin_amount`).value) > 0 ? parseFloat(document.querySelector(`#${formId} #coin_amount`).value) : false;
+
+                // Format date to dd-mm-yyyy and fetch the coin symbol and dervied coin id (for the serverside convinience)
+                if (date && coinName && payload.amount) {
+                    payload.date = date.substr(8, 2) + '-' + date.substr(5, 2) + '-' + date.substr(0, 4);
+                    payload.coinSymbol = coinName.split('-')[0].trim();
+
+                    payload.coin = app.coinList[payload.coinSymbol][0];
+
+                } else {
+                    // Invalid data - show error
+                    document.querySelector(`.form-${formId}-container .error-message`).innerHTML = `<p>Invalid data format or empty fields - Please check again</p>`;
+                    document.querySelector(`.form-${formId}-container .error-message`).style.display = 'block';
+                    return;
+                }
+
+            } else if (formId == 'delete') {
+                // get the id of the current assest
+                const assestId = e.target.parentElement.parentElement.parentElement.id;
+                payload.id = assestId;
+                console.log(payload, method, path);
+            }
+            // Make the query string object - this is needed only when sending DELETE requests 
+            const queryStringObject = method == 'DELETE' ? payload : {};
+            console.log(payload, path, method, queryStringObject);
+
+            // Call the API
+            // (headers, path, method, queryStringObject, payload, callback)
+            app.client.request(undefined, path, method, queryStringObject, payload, function(statusCode, responsePayload) {
+                if (!(statusCode == 201 || statusCode == 200)) {
+                    if (statusCode == 403) {
+                        // Invalid token - Logout imedietly
+                        app.logUserOut();
+                    } else {
+                        const error = typeof(responsePayload.error) == 'string' ? responsePayload.error : 'An error occured, please try again';
+
+                        // Show error if there is a field for show error (Delete form does not have)
+                        if (document.querySelector(`.form-${formId}-container .error-message`)) {
                             document.querySelector(`.form-${formId}-container .error-message`).innerHTML = `<p>${error}</p>`;
                             document.querySelector(`.form-${formId}-container .error-message`).style.display = 'block';
                         }
-                    } else {
-                        app.formResponseHandler(formId, payload, responsePayload)
+
                     }
-                });
+                } else {
+                    app.formResponseHandler(formId, payload, responsePayload)
+                }
             });
-        });
-    }
+        }
+
+    });
+
 };
 
 // Handle responses of succesfull form submissions
@@ -664,7 +690,13 @@ app.formResponseHandler = function(formId, requestPayload, responsePayload) {
             }
         });
 
-    } else if (formId == 'add' || formId == 'edit') {
+        // Login form
+    } else if (formId == 'login') {
+        app.setToken(responsePayload.id);
+        window.location = '/dashboard';
+
+        // Reload the content on add/edit/delete forms
+    } else if (formId == 'add' || formId == 'edit' || formId == 'delete') {
         ui.hideAddAsset();
         ui.hideEditAsset();
         ui.showAssets();
@@ -680,7 +712,6 @@ app.init = function() {
     app.loadCorrectpage();
     app.addEventListners();
     app.bindForms();
-
 };
 
 // Activate on load

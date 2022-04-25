@@ -255,6 +255,10 @@ body {
     margin: 0;
 }
 
+.btn-logout:hover {
+    transform: scale(0.9);
+}
+
 .dashboard-title-container {
     /* background-color: aliceblue; */
     width: 100%;
