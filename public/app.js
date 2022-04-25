@@ -7,6 +7,18 @@
 const ui = {};
 const app = {};
 
+// Set the loading screen
+ui.setLoadingScreen = function() {
+    document.querySelector('.loading-screen').style.display = 'flex';
+}
+
+// Unset the loading screen
+ui.unsetLoadingScreen = function() {
+    document.querySelector('.loading-screen').style.display = 'none';
+};
+
+
+
 // Hide the content of index page
 ui.hideIndex = function() {
     document.querySelector('.title-container').classList.add('hide');
@@ -35,12 +47,24 @@ ui.hideSignUp = function() {
     Array.from(document.querySelectorAll('.error-message')).forEach(function(element) {
         element.style.display = 'none';
     });
+    // CLear input fields
+    document.querySelector('#user_email').value = '';
+    document.querySelector('#user_password').value = '';
+    document.querySelector('#confirm_user_password').value = '';
     document.querySelector('.form-signup-container').classList.add('hideForm');
 };
 
 // Hides login form
 ui.hideLogin = function() {
     document.querySelector('.form-login-container').classList.add('hideForm');
+
+    // CLear input fields
+    Array.from(document.querySelectorAll('#user_email')).forEach(function(element) {
+        element.value = '';
+    });
+    Array.from(document.querySelectorAll('#user_password')).forEach(function(element) {
+        element.value = '';
+    });
 };
 
 // Show card details
@@ -98,8 +122,10 @@ ui.showAddAsset = function() {
 
 ui.hideAddAsset = function() {
     document.querySelector('.form-add-container').classList.add('hideForm');
-    // Just for clear the Coin name input field (only add form)
+    //  For input fields (only add form)
     document.querySelector('#coin_name').value = '';
+    document.querySelector('#coin_amount').value = '';
+    document.querySelector('#bought_date').value = '';
     // Remove any error messages
     Array.from(document.querySelectorAll('.error-message')).forEach(function(errorMsg) {
         errorMsg.style.display = 'none';;
@@ -285,7 +311,9 @@ app.loadDashboardPage = function() {
             let queryStringObject = {
                 id: app.token
             }
+            ui.setLoadingScreen();
             app.client.request(undefined, '/api/tokens', 'GET', queryStringObject, undefined, function(statusCode, tokenData) {
+                ui.unsetLoadingScreen();
                 if ((statusCode == 200 || statusCode == 201) && tokenData != {}) {
                     app.currentUser = tokenData.email;
 
@@ -294,7 +322,9 @@ app.loadDashboardPage = function() {
                     };
 
                     // Get the list of assets using current user's email
+                    ui.setLoadingScreen();
                     app.client.request(undefined, '/api/users', 'GET', queryStringObject, undefined, function(statusCode, userData) {
+                        ui.unsetLoadingScreen();
                         if ((statusCode == 200 || statusCode == 201) && userData != {}) {
                             // Get the details about each asset
                             if (typeof(userData.assets) == 'object' && userData.assets instanceof Array && userData.assets.length > 0) {
@@ -302,7 +332,9 @@ app.loadDashboardPage = function() {
                                     queryStringObject = {
                                         id: asset
                                     };
+                                    ui.setLoadingScreen();
                                     app.client.request(undefined, '/api/assets', 'GET', queryStringObject, undefined, function(statusCode, assetDetails) {
+                                        ui.unsetLoadingScreen();
                                         if ((statusCode == 200 || statusCode == 201) && assetDetails != {}) {
                                             // Make the asset card
                                             app.renderAssetCard(assetDetails);
@@ -384,12 +416,31 @@ app.renderAssetCard = function(assetObject) {
     // Calculate information
     const boughtValue = (assetObject.coin_amount * assetObject.buy_price).toFixed(2);
     const currentValue = (assetObject.coin_amount * assetObject.today_price).toFixed(2);
-    const valueDifference = (currentValue - boughtValue).toFixed(2);
+
+    let valueDifference = (currentValue - boughtValue).toFixed(2);
     const colorMain = valueDifference < 0 ? 'red' : 'green';
-    const change24Hours = (((assetObject.today_price - assetObject.yesterday_price) / assetObject.yesterday_price) * 100).toFixed(2);
+    valueDifference = valueDifference > 0 ? '+' + String(valueDifference) : valueDifference;
+
+    let change24Hours = (((assetObject.today_price - assetObject.yesterday_price) / assetObject.yesterday_price) * 100).toFixed(2);
+    change24Hours = change24Hours > 0 ? '+' + String(change24Hours) : change24Hours;
     const color24Change = change24Hours < 0 ? 'red' : 'green';
-    const chanceOverall = (((assetObject.today_price - assetObject.buy_price) / assetObject.buy_price) * 100).toFixed(2);
+
+    let chanceOverall = (((assetObject.today_price - assetObject.buy_price) / assetObject.buy_price) * 100).toFixed(2);
+    chanceOverall = chanceOverall > 0 ? '+' + String(chanceOverall) : chanceOverall;
     const colorOverallChange = chanceOverall < 0 ? 'red' : 'green';
+
+    // Get the data
+    const today = new Date();
+    const buyDay = new Date(assetObject.buy_date.substr(3, 2) + '/' + assetObject.buy_date.substr(0, 2) + '/' + assetObject.buy_date.substr(6, 4));
+    const daysGone = Math.floor((today - buyDay) / (1000 * 60 * 60 * 24));
+    let daysOutput = '';
+    if (daysGone == 0) {
+        daysOutput = 'Today';
+    } else if (daysGone == 1) {
+        daysOutput = 'Yesterday';
+    } else {
+        daysOutput = daysGone + ' days ago';
+    }
 
     const cardUI = document.createElement('div');
     cardUI.className = 'card';
@@ -424,7 +475,7 @@ app.renderAssetCard = function(assetObject) {
                 <div class="bought-container data-container">
                     <h4>Bought</h4>
                     <h5>${assetObject.buy_date}</h5>
-                    <p>20 days ago</p>
+                    <p>${daysOutput}</p>
                 </div>
             </div>
             <div class="bought-bottom-container">
@@ -435,7 +486,7 @@ app.renderAssetCard = function(assetObject) {
                 </div>
                 <div class="change-all-container data-container">
                     <h4>Change</h4>
-                    <h5>Past 20 Days</h5>
+                    <h5>Since bought</h5>
                     <p class="${colorOverallChange}">${chanceOverall}%</p>
                 </div>
             </div>
@@ -476,7 +527,7 @@ app.addEventListners = function() {
         document.querySelector('.login-btn').addEventListener('click', function() {
             // If there is a token already in the local storage, then log in the user whn user clicks login
             if (app.context == '/' && app.token) {
-                // window.location = '/dashboard';
+                window.location = '/dashboard';
             }
             ui.hideIndex();
             ui.showLogin();
@@ -544,8 +595,8 @@ app.logUserOut = function() {
         'id': app.token
     };
 
+    ui.setLoadingScreen();
     app.client.request(undefined, '/api/tokens', 'DELETE', queryStringObject, undefined, function(statusCode, responseData) {
-        console.log(statusCode, responseData);
         // Set the token to false
         app.setToken(false);
 
@@ -555,6 +606,7 @@ app.logUserOut = function() {
 
 };
 
+// What happends after  form is submitted
 app.bindForms = function() {
     document.querySelector('body').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -564,7 +616,6 @@ app.bindForms = function() {
             const formId = e.target.id;
             // Path comes like this : http://localhost:3000/api/assets. So need to get rid of  http://localhost:3000
             const path = e.target.action.replace('http://localhost:3000', '');
-            console.log(path);
             const method = document.querySelector(`#${formId} #_method`).value;
 
             // Hide the error message if there is one and it is currently visible currently visible
@@ -618,7 +669,19 @@ app.bindForms = function() {
                     payload.date = date.substr(8, 2) + '-' + date.substr(5, 2) + '-' + date.substr(0, 4);
                     payload.coinSymbol = coinName.split('-')[0].trim();
 
-                    payload.coin = app.coinList[payload.coinSymbol][0];
+                    try {
+                        // CHeck whether a the coin symbol is valid
+                        if (app.coinList[payload.coinSymbol] == null) {
+                            throw new Error();
+                        }
+                        payload.coin = app.coinList[payload.coinSymbol][0];
+                    } catch (e) {
+                        // Invalid data - show error
+                        document.querySelector(`.form-${formId}-container .error-message`).innerHTML = `<p>Invalid coin name - Please check again</p>`;
+                        document.querySelector(`.form-${formId}-container .error-message`).style.display = 'block';
+                        return;
+                    }
+
 
                 } else {
                     // Invalid data - show error
@@ -631,7 +694,6 @@ app.bindForms = function() {
                 // get the id of the current assest
                 const assestId = e.target.parentElement.parentElement.parentElement.id;
                 payload.id = assestId;
-                console.log(payload, method, path);
             }
             // Make the query string object - this is needed only when sending DELETE requests 
             const queryStringObject = method == 'DELETE' ? payload : {};
@@ -639,7 +701,9 @@ app.bindForms = function() {
 
             // Call the API
             // (headers, path, method, queryStringObject, payload, callback)
+            ui.setLoadingScreen();
             app.client.request(undefined, path, method, queryStringObject, payload, function(statusCode, responsePayload) {
+                ui.unsetLoadingScreen();
                 if (!(statusCode == 201 || statusCode == 200)) {
                     if (statusCode == 403) {
                         // Invalid token - Logout imedietly
@@ -655,6 +719,7 @@ app.bindForms = function() {
 
                     }
                 } else {
+
                     app.formResponseHandler(formId, payload, responsePayload)
                 }
             });
@@ -673,9 +738,10 @@ app.formResponseHandler = function(formId, requestPayload, responsePayload) {
             email: requestPayload.email,
             password: requestPayload.password
         };
-
+        ui.setLoadingScreen();
         app.client.request(undefined, '/api/tokens', 'POST', undefined, newPayload, function(newStatusCode, newResponsePayload) {
             if (!(newStatusCode == 201 || newStatusCode == 200)) {
+                ui.unsetLoadingScreen();
                 const error = typeof(responsePayload.error) == 'string' ? responsePayload.error : 'An error occured, please try again';
                 console.log(newResponsePayload.id)
                     // Show error
@@ -685,7 +751,7 @@ app.formResponseHandler = function(formId, requestPayload, responsePayload) {
             } else {
                 console.log(newResponsePayload.id)
                 app.setToken(newResponsePayload.id);
-                // window.location = '/dashboard';
+                window.location = '/dashboard';
 
             }
         });
