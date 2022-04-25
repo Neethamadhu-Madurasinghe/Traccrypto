@@ -351,6 +351,8 @@ app.loadDashboardPage = function() {
                     });
                 } else {
                     console.log('Error getting token data: ' + statusCode);
+                    // Kick the user in case of expired token
+                    app.logUserOut();
                 }
             });
 
