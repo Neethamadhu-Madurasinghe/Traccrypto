@@ -1,0 +1,15 @@
+{
+  "name": "traccrypto",
+  "version": "1.0.0",
+  "description": "Simple full stack web application for keep track of crypto currency\r https://traccypto.herokuapp.com/",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
